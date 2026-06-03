@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>REIC / Autism Centre - Daily Reporting</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-d: #3730a3;
+      --primary-l: #818cf8;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-m: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 24px rgba(79,70,229,0.10);
+      --r: 16px; --rs: 10px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { font-family:'Outfit',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+    /* LOGIN */
+    .login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%); }
+    .login-card { background:#fff; border-radius:24px; padding:36px 28px; width:100%; max-width:380px; box-shadow:0 20px 60px rgba(0,0,0,0.2); }
+    .login-logo { text-align:center; font-size:48px; margin-bottom:8px; }
+    .login-title { text-align:center; font-size:20px; font-weight:800; color:var(--primary); margin-bottom:4px; }
+    .login-sub { text-align:center; font-size:12px; color:var(--text-m); margin-bottom:28px; }
+    .login-tabs { display:flex; background:#f1f5f9; border-radius:var(--rs); padding:4px; margin-bottom:20px; }
+    .login-tab { flex:1; padding:8px; border:none; background:transparent; border-radius:8px; font-family:inherit; font-size:12px; font-weight:600; color:var(--text-m); cursor:pointer; transition:all 0.2s; }
+    .login-tab.active { background:#fff; color:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+    .login-form-group { margin-bottom:14px; }
+    .login-label { display:block; font-size:11px; font-weight:700; color:var(--text-m); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px; }
+    .login-input { width:100%; padding:12px 14px; border:2px solid var(--border); border-radius:var(--rs); font-family:inherit; font-size:14px; color:var(--text); background:#f8fafc; transition:all 0.2s; }
+    .login-input:focus { outline:none; border-color:var(--primary-l); background:#fff; box-shadow:0 0 0 4px rgba(79,70,229,0.10); }
+    .login-btn { width:100%; padding:14px; border:none; border-radius:var(--rs); background:linear-gradient(135deg,var(--primary),#7c3aed); color:#fff; font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; margin-top:8px; transition:all 0.2s; }
+    .login-btn:active { transform:scale(0.98); }
+    .login-error { background:#fef2f2; border:1px solid #fecaca; color:var(--error); padding:10px 14px; border-radius:8px; font-size:13px; margin-top:12px; display:none; }
+
+    /* HEADER */
+    .header { background:linear-gradient(135deg,var(--primary) 0%,#7c3aed 100%); padding:0 16px; display:flex; align-items:center; justify-content:space-between; height:60px; position:sticky; top:0; z-index:100; box-shadow:0 2px 16px rgba(79,70,229,0.25); }
+    .header-left { display:flex; align-items:center; gap:10px; }
+    .header-title { color:#fff; font-size:14px; font-weight:700; line-height:1.2; }
+    .header-sub { color:rgba(255,255,255,0.7); font-size:10px; }
+    .header-right { display:flex; align-items:center; gap:8px; }
+    .user-badge { background:rgba(255,255,255,0.2); color:#fff; padding:4px 10px; border-radius:100px; font-size:11px; font-weight:600; }
+    .logout-btn { background:rgba(255,255,255,0.15); border:none; color:#fff; padding:6px 12px; border-radius:8px; font-family:inherit; font-size:11px; font-weight:600; cursor:pointer; }
+    .logout-btn:hover { background:rgba(255,255,255,0.25); }
+
+    /* NAV */
+    .nav-bar { background:#fff; border-bottom:2px solid var(--border); display:flex; overflow-x:auto; }
+    .nav-btn { flex-shrink:0; padding:12px 16px; border:none; border-bottom:3px solid transparent; background:transparent; font-family:inherit; font-size:12px; font-weight:600; color:var(--text-m); cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+    .nav-btn.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    /* PAGES */
+    .page { display:none; padding:16px; max-width:800px; margin:0 auto; }
+    .page.active { display:block; }
+
+    /* CARDS */
+    .card { background:var(--card); border-radius:var(--r); padding:18px 16px; box-shadow:var(--shadow); margin-bottom:14px; }
+    .card-title { font-size:13px; font-weight:700; color:var(--primary); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+    .card-icon { width:30px; height:30px; background:linear-gradient(135deg,var(--primary),#7c3aed); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+
+    /* FORM */
+    .form-group { margin-bottom:12px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media(max-width:480px){ .form-row { grid-template-columns:1fr; } }
+    label { display:block; font-size:11px; font-weight:700; color:var(--text-m); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; }
+    .req::after { content:' *'; color:var(--error); }
+    input,select,textarea { width:100%; padding:10px 13px; border:2px solid var(--border); border-radius:var(--rs); font-family:inherit; font-size:14px; color:var(--text); background:#f8fafc; transition:all 0.2s; appearance:none; -webkit-appearance:none; }
+    input:focus,select:focus,textarea:focus { outline:none; border-color:var(--primary-l); background:#fff; box-shadow:0 0 0 4px rgba(79,70,229,0.10); }
+    textarea { resize:vertical; min-height:70px; }
+    .sel-wrap { position:relative; }
+    .sel-wrap::after { content:'▾'; position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--primary); pointer-events:none; }
+    select { padding-right:32px; }
+    .radio-group { display:flex; gap:16px; flex-wrap:wrap; margin-top:6px; }
+    .radio-item { display:flex; align-items:center; gap:6px; cursor:pointer; font-size:14px; }
+    .radio-item input { width:16px; height:16px; accent-color:var(--primary); }
+
+    /* DUTY TOGGLE */
+    .duty-toggle { display:flex; background:#f1f5f9; border-radius:var(--rs); padding:4px; margin-bottom:10px; }
+    .duty-btn { flex:1; padding:8px; border:none; background:transparent; border-radius:8px; font-family:inherit; font-size:12px; font-weight:600; color:var(--text-m); cursor:pointer; transition:all 0.2s; }
+    .duty-btn.active { background:#fff; color:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+
+    /* BUTTONS */
+    .btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:13px; border:none; border-radius:var(--rs); font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.2s; }
+    .btn-primary { background:linear-gradient(135deg,var(--primary),#7c3aed); color:#fff; box-shadow:0 4px 16px rgba(79,70,229,0.35); }
+    .btn-primary:active { transform:scale(0.98); }
+
+    /* STATS */
+    .stats-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:14px; }
+    @media(min-width:600px){ .stats-grid { grid-template-columns:repeat(4,1fr); } }
+    .stat-card { background:var(--card); border-radius:var(--r); padding:14px; box-shadow:var(--shadow); text-align:center; }
+    .stat-num { font-size:26px; font-weight:800; }
+    .stat-label { font-size:10px; color:var(--text-m); margin-top:2px; font-weight:600; text-transform:uppercase; }
+    .s-blue .stat-num { color:var(--primary); }
+    .s-green .stat-num { color:var(--success); }
+    .s-orange .stat-num { color:var(--warning); }
+    .s-cyan .stat-num { color:var(--accent); }
+
+    /* TABLE */
+    .table-wrap { overflow-x:auto; border-radius:var(--rs); }
+    table { width:100%; border-collapse:collapse; font-size:12px; }
+    th { background:linear-gradient(135deg,var(--primary),#7c3aed); color:#fff; padding:9px 10px; text-align:left; font-weight:600; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
+    td { padding:9px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:#f8fafc; }
+    .badge { display:inline-block; padding:2px 7px; border-radius:100px; font-size:10px; font-weight:700; }
+    .b-new { background:#dbeafe; color:#1d4ed8; }
+    .b-fu { background:#d1fae5; color:#065f46; }
+    .b-reic { background:#ede9fe; color:#5b21b6; }
+    .b-autism { background:#fce7f3; color:#9d174d; }
+
+    /* FILTERS */
+    .centre-tabs { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+    .centre-tab { padding:6px 12px; border:2px solid var(--border); border-radius:100px; font-size:11px; font-weight:600; color:var(--text-m); cursor:pointer; transition:all 0.2s; background:#fff; }
+    .centre-tab.active { border-color:var(--primary); background:var(--primary); color:#fff; }
+    .filter-bar { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+    .filter-bar input,.filter-bar select { flex:1; min-width:130px; }
+
+    /* PROGRESS */
+    .prog-row { margin-bottom:10px; }
+    .prog-label { display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px; }
+    .prog-bar { height:6px; background:#e2e8f0; border-radius:100px; overflow:hidden; }
+    .prog-fill { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--primary),#7c3aed); transition:width 0.5s; }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(100px); background:#0f172a; color:#fff; padding:11px 22px; border-radius:100px; font-size:13px; font-weight:600; box-shadow:0 8px 24px rgba(0,0,0,0.2); transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1); z-index:999; white-space:nowrap; }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+    .toast.ok { background:var(--success); }
+    .toast.err { background:var(--error); }
+
+    /* LOADING */
+    .loading { display:none; position:fixed; inset:0; background:rgba(79,70,229,0.85); z-index:500; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
+    .loading.show { display:flex; }
+    .spinner { width:44px; height:44px; border:4px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-txt { color:#fff; font-size:14px; font-weight:600; }
+
+    .info-box { background:linear-gradient(135deg,#ede9fe,#ddd6fe); border-left:3px solid var(--primary); border-radius:8px; padding:9px 12px; font-size:12px; color:var(--primary-d); margin-bottom:12px; }
+    .divider { height:1px; background:linear-gradient(to right,transparent,var(--border),transparent); margin:14px 0; }
+    .empty { text-align:center; padding:32px 20px; color:var(--text-m); }
+    .empty-icon { font-size:40px; margin-bottom:8px; }
+    .app-wrap { display:none; }
+    .app-wrap.show { display:block; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN SCREEN ══════════ -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-logo">🏥</div>
+    <div class="login-title">REIC / Autism Centre</div>
+    <div class="login-sub">Daily Reporting System</div>
+
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="setLoginRole('staff',this)">👤 Staff</button>
+      <button class="login-tab" onclick="setLoginRole('admin',this)">🔐 Admin</button>
+    </div>
+
+    <div class="login-form-group">
+      <label class="login-label">Username</label>
+      <input class="login-input" type="text" id="loginUser" placeholder="Enter username">
+    </div>
+    <div class="login-form-group">
+      <label class="login-label">Password</label>
+      <input class="login-input" type="password" id="loginPass" placeholder="Enter password">
+    </div>
+    <button class="login-btn" onclick="doLogin()">🔓 Login</button>
+    <div class="login-error" id="loginError">❌ Invalid username or password</div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div class="app-wrap" id="appWrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div style="font-size:20px">🏥</div>
+      <div>
+        <div class="header-title">REIC / Autism Centre</div>
+        <div class="header-sub">Daily Reporting System</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="user-badge" id="userBadge">👤 Staff</div>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn active" onclick="showPage('form',this)">📝 Daily Report</button>
+    <button class="nav-btn admin-only" onclick="showPage('dashboard',this)" style="display:none">📊 Dashboard</button>
+    <button class="nav-btn admin-only" onclick="showPage('reports',this)" style="display:none">📋 All Reports</button>
+  </div>
+
+  <!-- ═══ PAGE: FORM ═══ -->
+  <div class="page active" id="page-form">
+    <div class="info-box">📋 ദൈനംദിന റിപ്പോർട്ട് ഇവിടെ സമർപ്പിക്കുക. * fields നിർബന്ധം.</div>
+
+    <form id="mainForm">
+      <div class="card">
+        <div class="card-title"><div class="card-icon">🏥</div>Centre & Date</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="req">Name of Centre</label>
+            <div class="sel-wrap">
+              <select id="f_centre" required>
+                <option value="">-- Select Centre --</option>
+                <optgroup label="REIC">
+                  <option>REIC, Medical College, Thiruvananthapuram</option>
+                  <option>REIC, Medical College, Alappuzha</option>
+                  <option>REIC, Medical College, Kottayam</option>
+                  <option>REIC, Medical College, Thrissur</option>
+                  <option>REIC, Medical College, Kozhikkode</option>
+                </optgroup>
+                <optgroup label="Autism Centre">
+                  <option>Autism Centre, Medical College, Thiruvananthapuram</option>
+                  <option>Autism Centre, Medical College, Alappuzha</option>
+                  <option>Autism Centre, Medical College, Kottayam</option>
+                  <option>Autism Centre, Medical College, Thrissur</option>
+                  <option>Autism Centre, Medical College, Kozhikkode</option>
+                  <option>Autism Centre, Medical College, Manjeri</option>
+                </optgroup>
+                <optgroup label="Other">
+                  <option>IMHANS, Kozhikkode</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="req">Date</label>
+            <input type="date" id="f_date" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="card-icon">👤</div>Staff Details</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="req">Name</label>
+            <input type="text" id="f_name" placeholder="Full name" required>
+          </div>
+          <div class="form-group">
+            <label class="req">Designation</label>
+            <div class="sel-wrap">
+              <select id="f_designation" required>
+                <option value="">-- Select --</option>
+                <option>Paediatrician / Medical Officer</option>
+                <option>Clinical Psychologist</option>
+                <option>Optometrist</option>
+                <option>Staff Nurse</option>
+                <option>Data Entry Operator</option>
+                <option>REIC Manager</option>
+                <option>Developmental Therapist</option>
+                <option>Occupational Therapist</option>
+                <option>Physiotherapist</option>
+                <option>Audiologist cum Speech Therapist</option>
+                <option>Special Educator</option>
+                <option>Social Worker</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="card-icon">🗂️</div>Duty Details</div>
+        <div class="duty-toggle">
+          <button type="button" class="duty-btn active" onclick="setDuty('centre',this)">🏥 Duty @ Centre</button>
+          <button type="button" class="duty-btn" onclick="setDuty('others',this)">🔄 Others</button>
+        </div>
+        <div class="form-group">
+          <label>Specify Duty Details</label>
+          <input type="text" id="f_duty" placeholder="e.g. OPD, Screening, Therapy...">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="card-icon">🧒</div>Beneficiary Details</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Name of Beneficiary</label>
+            <input type="text" id="f_bene_name" placeholder="Beneficiary name">
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <div class="radio-group">
+              <label class="radio-item"><input type="radio" name="gender" value="Male"><span>Male</span></label>
+              <label class="radio-item"><input type="radio" name="gender" value="Female"><span>Female</span></label>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="req">Contact Number</label>
+            <input type="tel" id="f_contact" placeholder="10-digit number" maxlength="10" pattern="[0-9]{10}" required>
+          </div>
+          <div class="form-group">
+            <label>Service Type</label>
+            <div class="sel-wrap">
+              <select id="f_service_type">
+                <option value="">-- Select --</option>
+                <option>New case</option>
+                <option>Follow up</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Services Offered</label>
+          <input type="text" id="f_services" placeholder="Services provided">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Session Start Time</label>
+            <input type="time" id="f_start_time">
+          </div>
+          <div class="form-group">
+            <label class="req">Session End Time</label>
+            <input type="time" id="f_end_time" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Comments</label>
+          <textarea id="f_comments" placeholder="Additional comments..."></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">✅ Submit Daily Report</button>
+    </form>
+  </div>
+
+  <!-- ═══ PAGE: DASHBOARD ═══ -->
+  <div class="page" id="page-dashboard">
+
+    <div class="stats-grid">
+      <div class="stat-card s-blue"><div class="stat-num" id="s-total">0</div><div class="stat-label">Total Reports</div></div>
+      <div class="stat-card s-green"><div class="stat-num" id="s-today">0</div><div class="stat-label">Today</div></div>
+      <div class="stat-card s-orange"><div class="stat-num" id="s-new">0</div><div class="stat-label">New Cases</div></div>
+      <div class="stat-card s-cyan"><div class="stat-num" id="s-fu">0</div><div class="stat-label">Follow Ups</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="card-icon">📊</div>Centre-wise Summary</div>
+      <div id="centreSummary"><div class="empty"><div class="empty-icon">📊</div>No data yet</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="card-icon">👥</div>Designation-wise Summary</div>
+      <div id="desigSummary"><div class="empty"><div class="empty-icon">👥</div>No data yet</div></div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: ALL REPORTS ═══ -->
+  <div class="page" id="page-reports">
+
+    <div class="centre-tabs">
+      <div class="centre-tab active" onclick="filterCentre('all',this)">🏥 All</div>
+      <div class="centre-tab" onclick="filterCentre('REIC',this)">REIC</div>
+      <div class="centre-tab" onclick="filterCentre('Autism',this)">Autism</div>
+      <div class="centre-tab" onclick="filterCentre('IMHANS',this)">IMHANS</div>
+    </div>
+
+    <div class="filter-bar">
+      <input type="date" id="filterDate" onchange="renderTable()">
+      <div class="sel-wrap" style="flex:1;min-width:130px">
+        <select id="filterDesig" onchange="renderTable()">
+          <option value="">All Designations</option>
+          <option>Paediatrician / Medical Officer</option>
+          <option>Clinical Psychologist</option>
+          <option>Optometrist</option>
+          <option>Staff Nurse</option>
+          <option>Data Entry Operator</option>
+          <option>REIC Manager</option>
+          <option>Developmental Therapist</option>
+          <option>Occupational Therapist</option>
+          <option>Physiotherapist</option>
+          <option>Audiologist cum Speech Therapist</option>
+          <option>Special Educator</option>
+          <option>Social Worker</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="card-icon">📋</div>Reports <span id="reportCount" style="font-size:11px;font-weight:400;color:var(--text-m);margin-left:4px"></span></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Centre</th>
+              <th>Staff</th>
+              <th>Designation</th>
+              <th>Beneficiary</th>
+              <th>Service Type</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="7"><div class="empty"><div class="empty-icon">📭</div>No reports yet</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end app-wrap -->
+
+<div class="loading" id="loading"><div class="spinner"></div><div class="loading-txt">Submitting report...</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzVb8UgyApG0rhN2kqSA8vjCRThsfeV0niLbHLJ-38YApEoUbdrPfbZMPMIFQQh-hIL/exec';
+
+// ── CREDENTIALS ──
+const USERS = {
+  staff:  { pass:'staff123',  role:'staff',  label:'Staff' },
+  admin:  { pass:'admin123',  role:'admin',  label:'Admin' }
+};
+
+let currentRole = 'staff';
+let loginRole   = 'staff';
+let allReports  = JSON.parse(localStorage.getItem('reic_reports') || '[]');
+let activeCentreFilter = 'all';
+
+// Set today
+document.getElementById('f_date').value = new Date().toISOString().split('T')[0];
+
+// ── LOGIN ──
+function setLoginRole(role, el) {
+  loginRole = role;
+  document.querySelectorAll('.login-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+
+  if (USERS[user] && USERS[user].pass === pass) {
+    currentRole = USERS[user].role;
+    document.getElementById('userBadge').textContent = '👤 ' + USERS[user].label;
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('appWrap').classList.add('show');
+    errEl.style.display = 'none';
+
+    // Show admin nav items
+    if (currentRole === 'admin') {
+      document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+    }
+  } else {
+    errEl.style.display = 'block';
+  }
+}
+
+// Enter key login
+document.getElementById('loginPass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+function doLogout() {
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('appWrap').classList.remove('show');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+  showPage('form', document.querySelector('.nav-btn'));
+}
+
+// ── NAVIGATION ──
+function showPage(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (page === 'dashboard') updateDashboard();
+  if (page === 'reports') renderTable();
+}
+
+// ── DUTY TOGGLE ──
+let dutyMode = 'centre';
+function setDuty(mode, el) {
+  dutyMode = mode;
+  document.querySelectorAll('.duty-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('f_duty').placeholder =
+    mode === 'centre' ? 'e.g. OPD, Screening, Therapy...' : 'Specify other duty details';
+}
+
+// ── TOAST ──
+function toast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.className = 'toast', 3500);
+}
+
+function setLoading(show) {
+  document.getElementById('loading').classList.toggle('show', show);
+}
+
+// ── FORM SUBMIT ──
+document.getElementById('mainForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const gender = document.querySelector('input[name="gender"]:checked');
+  const report = {
+    id: Date.now(),
+    timestamp: new Date().toLocaleString('en-IN', {timeZone:'Asia/Kolkata'}),
+    centre:      document.getElementById('f_centre').value,
+    date:        document.getElementById('f_date').value,
+    name:        document.getElementById('f_name').value,
+    designation: document.getElementById('f_designation').value,
+    dutyType:    dutyMode === 'centre' ? 'Duty @ Centre' : 'Others',
+    dutyDetails: document.getElementById('f_duty').value,
+    beneName:    document.getElementById('f_bene_name').value,
+    gender:      gender ? gender.value : '',
+    contact:     document.getElementById('f_contact').value,
+    serviceType: document.getElementById('f_service_type').value,
+    services:    document.getElementById('f_services').value,
+    startTime:   document.getElementById('f_start_time').value,
+    endTime:     document.getElementById('f_end_time').value,
+    comments:    document.getElementById('f_comments').value,
+  };
+
+  setLoading(true);
+  allReports.unshift(report);
+  localStorage.setItem('reic_reports', JSON.stringify(allReports));
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({sheet:'DailyReports', ...report})
+    });
+  } catch(err) {}
+
+  setLoading(false);
+  toast('✅ Report submitted successfully!', 'ok');
+  this.reset();
+  document.getElementById('f_date').value = new Date().toISOString().split('T')[0];
+  dutyMode = 'centre';
+  document.querySelectorAll('.duty-btn')[0].classList.add('active');
+  document.querySelectorAll('.duty-btn')[1].classList.remove('active');
+  document.getElementById('f_duty').placeholder = 'e.g. OPD, Screening, Therapy...';
+});
+
+// ── DASHBOARD ──
+function updateDashboard() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('s-total').textContent = allReports.length;
+  document.getElementById('s-today').textContent = allReports.filter(r => r.date === today).length;
+  document.getElementById('s-new').textContent   = allReports.filter(r => r.serviceType === 'New case').length;
+  document.getElementById('s-fu').textContent    = allReports.filter(r => r.serviceType === 'Follow up').length;
+
+  // Centre summary
+  const centres = [
+    'REIC, Medical College, Thrissur',
+    'Autism Centre, Medical College, Thrissur',
+    'REIC, Medical College, Thiruvananthapuram',
+    'Autism Centre, Medical College, Thiruvananthapuram',
+    'REIC, Medical College, Kozhikkode',
+    'Autism Centre, Medical College, Kozhikkode',
+    'REIC, Medical College, Kottayam',
+    'REIC, Medical College, Alappuzha',
+    'IMHANS, Kozhikkode',
+  ];
+  const totalR = allReports.length || 1;
+  const centreHtml = centres.map(c => {
+    const cnt = allReports.filter(r => r.centre === c).length;
+    if (!cnt) return '';
+    const pct = Math.round(cnt/totalR*100);
+    return `<div class="prog-row">
+      <div class="prog-label"><span style="font-size:12px">${c}</span><strong>${cnt}</strong></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('centreSummary').innerHTML = centreHtml || '<div class="empty"><div class="empty-icon">📊</div>No data yet</div>';
+
+  // Designation summary
+  const desigs = [...new Set(allReports.map(r => r.designation))].filter(Boolean);
+  const desigHtml = desigs.map(d => {
+    const cnt = allReports.filter(r => r.designation === d).length;
+    const pct = Math.round(cnt/totalR*100);
+    return `<div class="prog-row">
+      <div class="prog-label"><span style="font-size:12px">${d}</span><strong>${cnt}</strong></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('desigSummary').innerHTML = desigHtml || '<div class="empty"><div class="empty-icon">👥</div>No data yet</div>';
+}
+
+// ── REPORTS TABLE ──
+function filterCentre(f, el) {
+  activeCentreFilter = f;
+  document.querySelectorAll('.centre-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+function renderTable() {
+  const date  = document.getElementById('filterDate').value;
+  const desig = document.getElementById('filterDesig').value;
+  const filtered = allReports.filter(r => {
+    if (activeCentreFilter !== 'all' && !r.centre.includes(activeCentreFilter)) return false;
+    if (date  && r.date !== date) return false;
+    if (desig && r.designation !== desig) return false;
+    return true;
+  });
+
+  document.getElementById('reportCount').textContent = '(' + filtered.length + ' records)';
+  const tbody = document.getElementById('tableBody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">📭</div>No reports found</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(r => {
+    const isREIC   = r.centre.startsWith('REIC');
+    const isAutism = r.centre.startsWith('Autism');
+    const cBadge   = isREIC ? '<span class="badge b-reic">REIC</span>' : isAutism ? '<span class="badge b-autism">Autism</span>' : '<span class="badge b-fu">Other</span>';
+    const sBadge   = r.serviceType === 'New case' ? '<span class="badge b-new">New</span>' : r.serviceType === 'Follow up' ? '<span class="badge b-fu">Follow up</span>' : '—';
+    const loc      = r.centre.split(',').pop().trim();
+    return `<tr>
+      <td>${r.date}</td>
+      <td>${cBadge}<br><span style="font-size:10px;color:var(--text-m)">${loc}</span></td>
+      <td><strong>${r.name}</strong></td>
+      <td style="font-size:11px">${r.designation}</td>
+      <td>${r.beneName||'—'}<br><span style="font-size:10px;color:var(--text-m)">${r.contact}</span></td>
+      <td>${sBadge}</td>
+      <td style="font-size:11px">${r.startTime||'—'} – ${r.endTime||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
